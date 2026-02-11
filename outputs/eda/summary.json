@@ -1,0 +1,16 @@
+{
+  "generated_at": "2026-02-11T18:19:01",
+  "script": "eda_oct_2019.py",
+  "results": {
+    "approx_distinct": {
+      "user_id": 3308390,
+      "user_session": 8857215
+    },
+    "price_quantiles": {
+      "p01": 0.0,
+      "p50": 161.83,
+      "p99": 2574.07,
+      "p999": 2574.07
+    }
+  }
+}

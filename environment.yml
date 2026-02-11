@@ -1,0 +1,13 @@
+name: graduation_project
+channels:
+  - defaults
+dependencies:
+  - python=3.11
+  - pip
+  - pip:
+    - pyspark==3.5.3
+    - py4j==0.10.9.7
+    - pandas
+    - matplotlib
+    - seaborn
+    - pyarrow

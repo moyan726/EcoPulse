@@ -1,0 +1,156 @@
+{
+  "generated_at": "2026-02-11T18:22:27",
+  "results": {
+    "price_p999": 2574.07,
+    "price_outliers": [
+      {
+        "rule": "price < 0",
+        "count": 0,
+        "rate": 0.0,
+        "threshold": null
+      },
+      {
+        "rule": "price = 0",
+        "count": 68673,
+        "rate": 0.0016177856203304294,
+        "threshold": null
+      },
+      {
+        "rule": "price <= 0",
+        "count": 68673,
+        "rate": 0.0016177856203304294,
+        "threshold": null
+      },
+      {
+        "rule": "price > P99.9",
+        "count": 0,
+        "rate": 0.0,
+        "threshold": 2574.07
+      }
+    ],
+    "top_brands": [
+      {
+        "brand": NaN,
+        "cnt": 6113008,
+        "share": 0.14400909293848932,
+        "cum_share": 0.14400909293848932
+      },
+      {
+        "brand": "samsung",
+        "cnt": 5282775,
+        "share": 0.1244506200463222,
+        "cum_share": 0.2684597129848115
+      },
+      {
+        "brand": "apple",
+        "cnt": 4122554,
+        "share": 0.09711835190301418,
+        "cum_share": 0.36557806488782574
+      },
+      {
+        "brand": "xiaomi",
+        "cnt": 3083763,
+        "share": 0.07264670886530407,
+        "cum_share": 0.4382247737531298
+      },
+      {
+        "brand": "huawei",
+        "cnt": 1111205,
+        "share": 0.026177558432561192,
+        "cum_share": 0.464402332185691
+      },
+      {
+        "brand": "lucente",
+        "cnt": 655861,
+        "share": 0.015450650106090251,
+        "cum_share": 0.47985298229178125
+      },
+      {
+        "brand": "lg",
+        "cnt": 562404,
+        "share": 0.013249007674287053,
+        "cum_share": 0.4931019899660683
+      },
+      {
+        "brand": "bosch",
+        "cnt": 557090,
+        "share": 0.013123821461562461,
+        "cum_share": 0.5062258114276308
+      },
+      {
+        "brand": "oppo",
+        "cnt": 482887,
+        "share": 0.011375761141125334,
+        "cum_share": 0.5176015725687562
+      },
+      {
+        "brand": "sony",
+        "cnt": 456644,
+        "share": 0.010757533482011396,
+        "cum_share": 0.5283591060507675
+      }
+    ],
+    "top_categories": [
+      {
+        "category_code": NaN,
+        "cnt": 13515609,
+        "share": 0.3183981752684248,
+        "cum_share": 0.3183981752684248
+      },
+      {
+        "category_code": "electronics.smartphone",
+        "cnt": 11507231,
+        "share": 0.2710851840114826,
+        "cum_share": 0.5894833592799074
+      },
+      {
+        "category_code": "electronics.clocks",
+        "cnt": 1311033,
+        "share": 0.03088506887974406,
+        "cum_share": 0.6203684281596514
+      },
+      {
+        "category_code": "computers.notebook",
+        "cnt": 1137623,
+        "share": 0.026799908708767115,
+        "cum_share": 0.6471683368684186
+      },
+      {
+        "category_code": "electronics.video.tv",
+        "cnt": 1113750,
+        "share": 0.02623751306398462,
+        "cum_share": 0.6734058499324032
+      },
+      {
+        "category_code": "electronics.audio.headphone",
+        "cnt": 1100188,
+        "share": 0.02591802201826183,
+        "cum_share": 0.699323871950665
+      },
+      {
+        "category_code": "appliances.kitchen.refrigerators",
+        "cnt": 887755,
+        "share": 0.020913565351396334,
+        "cum_share": 0.7202374373020614
+      },
+      {
+        "category_code": "appliances.kitchen.washer",
+        "cnt": 869404,
+        "share": 0.0204812559442249,
+        "cum_share": 0.7407186932462863
+      },
+      {
+        "category_code": "appliances.environment.vacuum",
+        "cnt": 801670,
+        "share": 0.01888559110931946,
+        "cum_share": 0.7596042843556057
+      },
+      {
+        "category_code": "apparel.shoes",
+        "cnt": 763901,
+        "share": 0.017995836109621473,
+        "cum_share": 0.7776001204652272
+      }
+    ]
+  }
+}

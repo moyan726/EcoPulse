@@ -37,6 +37,7 @@ logs/
 
 # Project specific - Large Data
 data/row/
+data/dwd/
 data/*.zip
 data/*.cfg
 
