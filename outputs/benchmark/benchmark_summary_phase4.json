@@ -1,0 +1,37 @@
+{
+  "generated_at": "2026-02-11T20:04:52.699741",
+  "spark_version": "3.5.3",
+  "results": [
+    {
+      "scenario": "Full Scan Count",
+      "format": "Parquet",
+      "duration": 2.1115875244140625
+    },
+    {
+      "scenario": "Full Scan Count",
+      "format": "CSV",
+      "duration": 2.783890962600708
+    },
+    {
+      "scenario": "Columnar Sum",
+      "format": "Parquet",
+      "duration": 1.2184867858886719
+    },
+    {
+      "scenario": "Columnar Sum",
+      "format": "CSV",
+      "duration": 4.403173446655273
+    },
+    {
+      "scenario": "Filtered Query (dt=2019-10-01)",
+      "format": "Parquet",
+      "duration": 0.2369394302368164
+    },
+    {
+      "scenario": "Filtered Query (dt=2019-10-01)",
+      "format": "CSV",
+      "duration": 4.21432638168335
+    }
+  ],
+  "note": "Phase 4 validation with optimized environment"
+}

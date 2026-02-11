@@ -1,0 +1,7 @@
+﻿scenario,format,duration
+Full Scan Count,Parquet,2.1115875244140625
+Full Scan Count,CSV,2.783890962600708
+Columnar Sum,Parquet,1.2184867858886719
+Columnar Sum,CSV,4.403173446655273
+Filtered Query (dt=2019-10-01),Parquet,0.2369394302368164
+Filtered Query (dt=2019-10-01),CSV,4.21432638168335
