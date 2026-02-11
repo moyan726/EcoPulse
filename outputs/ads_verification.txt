@@ -1,0 +1,29 @@
+=== ADS Verification Report (2026-02-11 19:41:34.202311) ===
+
+--- 1. Funnel Summary (Global) ---
+  event_type  session_count  user_count dimension    dt brand
+0   purchase         629560      347118    global  None  None
+1       view        9242653     3022130    global  None  None
+2       cart         573097      337117    global  None  None
+
+
+--- 2. Retention Sample (First 5 Cohorts, Period 0 & 1) ---
+  cohort_date  period  retention_count  cohort_size  retention_rate
+0  2019-10-01       0           190188       190188        1.000000
+1  2019-10-01       1            32862       190188        0.172787
+2  2019-10-02       0           152103       152103        1.000000
+3  2019-10-02       1            20676       152103        0.135934
+4  2019-10-03       0           124262       124262        1.000000
+5  2019-10-03       1            18286       124262        0.147157
+6  2019-10-04       0           143216       143216        1.000000
+7  2019-10-04       1            17675       143216        0.123415
+8  2019-10-05       0           124922       124922        1.000000
+9  2019-10-05       1            14433       124922        0.115536
+
+
+--- 3. RFM Segmentation Summary ---
+            rfm_segment   count
+0  General Users (普通客户)  302643
+1       New Users (新客户)   44475
+
+
