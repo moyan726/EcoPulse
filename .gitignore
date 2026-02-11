@@ -35,9 +35,13 @@ ENV/
 logs/
 *.log
 
+# Pytest
+.pytest_cache/
+
 # Project specific - Large Data
 data/row/
 data/dwd/
+data/ads/
 data/*.zip
 data/*.cfg
 
