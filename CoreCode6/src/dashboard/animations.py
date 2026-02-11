@@ -85,38 +85,64 @@ def set_animation_config(config: AnimationConfig) -> AnimationConfig:
 
 
 # =====================================================================
-#  动画控制面板 (右下角悬浮 Popover)
+#  动画控制面板 (页面右侧集成 Popover)
 # =====================================================================
-_FLOATING_CSS = """
+_PANEL_CSS = """
 <style>
-div[data-testid="stPopover"],div.stPopover{
-  position:fixed!important;right:14px!important;bottom:14px!important;z-index:1000!important;
+.ecopulse-animation-panel [data-testid="stPopover"]{
+  display:flex;
+  justify-content:flex-start;
 }
-div[data-testid="stPopover"]>button,div.stPopover>button{
-  width:32px!important;height:32px!important;min-height:32px!important;
-  border-radius:8px!important;
-  border:1px solid rgba(255,255,255,.25)!important;
-  background:rgba(255,255,255,.12)!important;
-  backdrop-filter:blur(6px)!important;
-  color:#cfe2ff!important;font-size:.85rem!important;
-  box-shadow:0 2px 8px rgba(0,0,0,.25)!important;
-  padding:0!important;line-height:32px!important;
-  opacity:.6!important;transition:opacity .2s!important;
+.ecopulse-animation-panel [data-testid="stPopover"] > button{
+  min-height:40px!important;
+  padding:0.36rem 0.9rem!important;
+  border-radius:999px!important;
+  border:1px solid rgba(0,212,255,.45)!important;
+  background:linear-gradient(135deg,rgba(10,35,66,.88),rgba(16,64,104,.92))!important;
+  color:#eaf6ff!important;
+  font-size:.94rem!important;
+  font-weight:700!important;
+  letter-spacing:.2px!important;
+  box-shadow:0 8px 22px rgba(0,0,0,.28),0 0 16px rgba(0,212,255,.16)!important;
+  transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease!important;
 }
-div[data-testid="stPopover"]>button:hover,div.stPopover>button:hover{
-  opacity:1!important;border-color:rgba(0,212,255,.5)!important;
-  background:rgba(255,255,255,.18)!important;
+.ecopulse-animation-panel [data-testid="stPopover"] > button:hover{
+  transform:translateY(-1px)!important;
+  border-color:rgba(0,212,255,.82)!important;
+  box-shadow:0 12px 26px rgba(0,0,0,.32),0 0 22px rgba(0,212,255,.28)!important;
 }
-@media(max-width:768px){
-  div[data-testid="stPopover"],div.stPopover{right:10px!important;bottom:10px!important;}
+.ecopulse-animation-panel [data-testid="stPopover"] > button svg{
+  color:#93e8ff!important;
+  fill:#93e8ff!important;
+}
+.ecopulse-animation-panel [data-testid="stPopover"] > button:focus-visible{
+  outline:2px solid rgba(0,212,255,.6)!important;
+  outline-offset:2px!important;
+}
+.ecopulse-animation-panel .stCaption{
+  text-align:left;
+  color:#b9d0ea!important;
+  font-size:12px!important;
+}
+@media(max-width:900px){
+  .ecopulse-animation-panel [data-testid="stPopover"]{
+    justify-content:flex-start;
+  }
+  .ecopulse-animation-panel [data-testid="stPopover"] > button{
+    width:100%!important;
+    border-radius:12px!important;
+  }
+  .ecopulse-animation-panel .stCaption{
+    text-align:left;
+  }
 }
 </style>
 """
 
 
 def animation_control_panel() -> AnimationConfig:
-    """渲染右下角悬浮动画设置面板，返回当前配置。"""
-    st.markdown(_FLOATING_CSS, unsafe_allow_html=True)
+    """渲染左上集成式动画设置面板，返回当前配置。"""
+    st.markdown(_PANEL_CSS, unsafe_allow_html=True)
 
     config = get_animation_config()
     speed_val = min(2.0, max(0.5, float(config.global_speed_factor)))
@@ -124,48 +150,52 @@ def animation_control_panel() -> AnimationConfig:
     fps_opts = [30, 45, 60]
     fps_val = min(fps_opts, key=lambda v: abs(v - int(config.fps_target)))
 
-    with st.popover("⚙", help="动画设置", width="content"):
-        st.markdown("##### 动画设置")
-        enabled = st.toggle(
-            "启用动画", value=config.enabled, help="关闭后所有动画直接显示最终状态。"
-        )
-        global_speed = st.slider(
-            "速度倍率",
-            0.5, 2.0, speed_val, 0.1,
-            help="1.0=默认；0.5 更快；2.0 更慢。",
-            disabled=not enabled,
-        )
-        global_delay = st.slider(
-            "全局延迟 (ms)",
-            0, 1200, delay_val, 50,
-            help="所有动画统一附加的起始延迟。",
-            disabled=not enabled,
-        )
-        fps_target = st.select_slider(
-            "帧率目标 (fps)",
-            options=fps_opts, value=fps_val,
-            help="requestAnimationFrame 节流。",
-            disabled=not enabled,
-        )
-        reduced = st.checkbox(
-            "尊重系统 reduced-motion",
-            value=config.respect_reduced_motion,
-            help="若系统偏好「减少动态效果」则自动禁用动画。",
-        )
-
-        updated = set_animation_config(
-            AnimationConfig(
-                enabled=enabled,
-                respect_reduced_motion=reduced,
-                global_speed_factor=global_speed,
-                global_delay_ms=global_delay,
-                fps_target=fps_target,
+    left_col, _ = st.columns([0.24, 0.76])
+    with left_col:
+        st.markdown('<div class="ecopulse-animation-panel">', unsafe_allow_html=True)
+        with st.popover("🎛 动效设置", help="调整全局动画节奏", width="content"):
+            st.markdown("##### 动画设置")
+            enabled = st.toggle(
+                "启用动画", value=config.enabled, help="关闭后所有动画直接显示最终状态。"
             )
-        )
-        st.caption(
-            f"enabled={updated.enabled}  speed={updated.global_speed_factor:.1f}  "
-            f"delay={updated.global_delay_ms}ms  fps={updated.fps_target}"
-        )
+            global_speed = st.slider(
+                "速度倍率",
+                0.5, 2.0, speed_val, 0.1,
+                help="1.0=默认；0.5 更快；2.0 更慢。",
+                disabled=not enabled,
+            )
+            global_delay = st.slider(
+                "全局延迟 (ms)",
+                0, 1200, delay_val, 50,
+                help="所有动画统一附加的起始延迟。",
+                disabled=not enabled,
+            )
+            fps_target = st.select_slider(
+                "帧率目标 (fps)",
+                options=fps_opts, value=fps_val,
+                help="requestAnimationFrame 节流。",
+                disabled=not enabled,
+            )
+            reduced = st.checkbox(
+                "尊重系统 reduced-motion",
+                value=config.respect_reduced_motion,
+                help="若系统偏好「减少动态效果」则自动禁用动画。",
+            )
+
+            updated = set_animation_config(
+                AnimationConfig(
+                    enabled=enabled,
+                    respect_reduced_motion=reduced,
+                    global_speed_factor=global_speed,
+                    global_delay_ms=global_delay,
+                    fps_target=fps_target,
+                )
+            )
+            st.caption(
+                f"enabled={updated.enabled}  speed={updated.global_speed_factor:.1f}  "
+                f"delay={updated.global_delay_ms}ms  fps={updated.fps_target}"
+            )
+        st.markdown("</div>", unsafe_allow_html=True)
     return updated
 
 
@@ -342,9 +372,9 @@ def animated_radar(
 
     markup = _COMMON_JS + f"""
 <style>
-.radar-wrap{{width:100%;padding:8px 6px 14px;box-sizing:border-box;contain:content;}}
+.radar-wrap{{width:100%;padding:8px 6px 24px;box-sizing:border-box;contain:content;}}
 .radar-title{{text-align:center;color:#ecf4ff;font-size:1.05rem;font-weight:600;margin-bottom:8px;}}
-.radar-shell{{width:100%;max-width:440px;margin:0 auto;}}
+.radar-shell{{width:100%;max-width:500px;margin:0 auto;}}
 .radar-svg{{width:100%;height:auto;overflow:visible;}}
 .radar-grid{{fill:none;stroke:rgba(140,175,220,.22);stroke-width:1;}}
 .radar-axis{{stroke:rgba(140,175,220,.32);stroke-width:1;}}
@@ -356,7 +386,7 @@ def animated_radar(
 <div class="radar-wrap">
   {title_html}
   <div class="radar-shell">
-    <svg class="radar-svg" id="{eid}" viewBox="-190 -170 380 340" aria-label="animated-radar"></svg>
+    <svg class="radar-svg" id="{eid}" viewBox="-220 -200 440 400" aria-label="animated-radar"></svg>
   </div>
 </div>
 <script>
@@ -374,7 +404,7 @@ def animated_radar(
   const R=120,slice=Math.PI*2/cnt,mx=Math.max(1e-6,Number(cfg.max_value||100));
   const mk=t=>document.createElementNS(NS,t);
   for(let l=1;l<=5;l++){{const r=R/5*l,pts=[];for(let i=0;i<cnt;i++){{const a=i*slice-Math.PI/2;pts.push(`${{(r*Math.cos(a)).toFixed(2)}},${{(r*Math.sin(a)).toFixed(2)}}`);}}const g=mk('polygon');g.setAttribute('points',pts.join(' '));g.setAttribute('class','radar-grid');svg.appendChild(g);}}
-  for(let i=0;i<cnt;i++){{const a=i*slice-Math.PI/2,x=R*Math.cos(a),y=R*Math.sin(a);const ax=mk('line');ax.setAttribute('x1','0');ax.setAttribute('y1','0');ax.setAttribute('x2',x.toFixed(2));ax.setAttribute('y2',y.toFixed(2));ax.setAttribute('class','radar-axis');svg.appendChild(ax);const lb=mk('text');lb.setAttribute('x',(x*1.18).toFixed(2));lb.setAttribute('y',(y*1.18).toFixed(2));lb.setAttribute('class','radar-label');lb.textContent=cats[i];svg.appendChild(lb);}}
+  for(let i=0;i<cnt;i++){{const a=i*slice-Math.PI/2,x=R*Math.cos(a),y=R*Math.sin(a);const ax=mk('line');ax.setAttribute('x1','0');ax.setAttribute('y1','0');ax.setAttribute('x2',x.toFixed(2));ax.setAttribute('y2',y.toFixed(2));ax.setAttribute('class','radar-axis');svg.appendChild(ax);const lb=mk('text');lb.setAttribute('x',(x*1.22).toFixed(2));lb.setAttribute('y',(y*1.22).toFixed(2));lb.setAttribute('class','radar-label');lb.textContent=cats[i];svg.appendChild(lb);}}
   const poly=mk('polygon');poly.setAttribute('class','radar-polygon');poly.setAttribute('fill',cfg.fill_color);poly.setAttribute('stroke',cfg.stroke_color);svg.appendChild(poly);
   const tgtPts=[],dots=[];
   for(let i=0;i<cnt;i++){{const a=i*slice-Math.PI/2,nr=Math.max(0,Number(vals[i]||0)/mx),r2=nr*R,tx=r2*Math.cos(a),ty=r2*Math.sin(a);tgtPts.push({{x:tx,y:ty}});const d=mk('circle');d.setAttribute('class','radar-point');d.setAttribute('r','4.5');d.setAttribute('cx','0');d.setAttribute('cy','0');d.setAttribute('fill',cfg.stroke_color);d.setAttribute('stroke','#fff');d.setAttribute('stroke-width','1.5');const tip=mk('title');tip.textContent=`${{cats[i]}}: ${{Number(vals[i]||0).toLocaleString()}}`;d.appendChild(tip);svg.appendChild(d);dots.push(d);}}

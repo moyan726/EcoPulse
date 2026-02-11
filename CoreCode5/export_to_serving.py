@@ -1,6 +1,6 @@
 """
 模块名称：Serving 层导出脚本 (Export to Serving)
-作者：Trae AI
+作者：moyan726
 创建日期：2026-02-11
 最后修改：2026-02-11
 

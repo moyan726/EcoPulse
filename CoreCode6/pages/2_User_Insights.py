@@ -138,6 +138,17 @@ def main() -> None:
     if "rfm_segment" in df_rfm.columns:
         seg = df_rfm["rfm_segment"].value_counts().reset_index()
         seg.columns = ["segment", "count"]
+        seg_label_map = {
+            "Need Attention (需要关注用户)": "需关注",
+            "Potential Loyalist (潜力客户)": "潜力客户",
+            "New Customers (新客户)": "新客户",
+            "Loyal (一般价值客户)": "忠诚客户",
+            "Champions (重要价值客户)": "重要客户",
+            "At Risk (潜在流失用户)": "潜在流失",
+            "Promising (成长客户)": "成长客户",
+            "Hibernating (沉睡用户)": "沉睡用户",
+        }
+        seg["segment_short"] = seg["segment"].map(lambda s: seg_label_map.get(str(s), str(s)))
 
         left, right = st.columns([1, 2])
 
@@ -145,14 +156,29 @@ def main() -> None:
             st.markdown('<div class="section-title">📊 用户价值分层</div>', unsafe_allow_html=True)
             fig_pie = go.Figure(
                 go.Pie(
-                    labels=seg["segment"],
+                    labels=seg["segment_short"],
                     values=seg["count"],
+                    customdata=seg["segment"],
                     hole=0.6,
                     marker=dict(colors=CLUSTER_COLORS + ["#4ecdc4", "#95e1d3", "#ff9ff3", "#feca57"]),
-                    textinfo="percent+label",
+                    textinfo="label+percent",
+                    textposition="outside",
+                    textfont=dict(size=11),
+                    automargin=True,
+                    hovertemplate=(
+                        "<b>%{customdata}</b><br>"
+                        "占比: %{percent}<br>"
+                        "人数: %{value:,}<extra></extra>"
+                    ),
                 )
             )
-            fig_pie.update_layout(height=360, margin=dict(l=20, r=20, t=20, b=20), showlegend=False)
+            fig_pie.update_layout(
+                height=430,
+                margin=dict(l=36, r=100, t=20, b=60),
+                showlegend=False,
+                uniformtext_minsize=10,
+                uniformtext_mode="show",
+            )
             st.plotly_chart(fig_pie, width="stretch")
 
         with right:
@@ -168,7 +194,7 @@ def main() -> None:
                     title=f"高价值群体画像 (Cluster {cid})",
                     total_duration_ms=1400, stagger_ms=100,
                     fill_color="rgba(0, 212, 255, 0.24)", stroke_color="#00d4ff",
-                    component_key="user-radar-main", height=380,
+                    component_key="user-radar-main", height=470,
                 )
             else:
                 st.info("暂无可用聚类数据。")

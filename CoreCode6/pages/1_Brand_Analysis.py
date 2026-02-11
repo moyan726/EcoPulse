@@ -142,12 +142,17 @@ def main() -> None:
             unsafe_allow_html=True,
         )
 
+        stage_name_map = {"view": "浏览", "cart": "加购", "purchase": "购买"}
+
         funnel_rows = brand_data.groupby("event_type", as_index=False)["session_count"].sum()
         sorter = {"view": 1, "cart": 2, "purchase": 3}
         funnel_rows["sort_id"] = funnel_rows["event_type"].map(sorter).fillna(99).astype(int)
         funnel_rows = funnel_rows.sort_values("sort_id")
+        funnel_rows["stage_label"] = (
+            funnel_rows["event_type"].map(stage_name_map).fillna(funnel_rows["event_type"])
+        )
 
-        # 流失率标注
+        # 右侧流失/转化注释卡
         annotations = []
         if len(funnel_rows) >= 3:
             v = funnel_rows.iloc[0]["session_count"]
@@ -155,39 +160,93 @@ def main() -> None:
             p = funnel_rows.iloc[2]["session_count"]
 
             if v > 0:
+                loss_rate = (v - c) / v
                 annotations.append(
                     dict(
-                        x=0.5, y=0.85,
+                        x=0.66, y=0.62,
                         xref="paper", yref="paper",
-                        text=f"流失 {(v - c) / v:.1%}",
-                        showarrow=False,
-                        font=dict(color="#ff6b6b", size=14),
+                        text=(
+                            "<span style='font-size:14px;font-weight:700;letter-spacing:.3px;'>浏览→加购流失率</span>"
+                            f"<br><span style='font-size:31px;font-weight:900;letter-spacing:.4px;'>{loss_rate:.1%}</span>"
+                        ),
+                        showarrow=True,
+                        arrowhead=2,
+                        arrowsize=1.0,
+                        arrowwidth=2.0,
+                        arrowcolor="rgba(255,91,125,0.88)",
+                        ax=210,
+                        ay=-16,
+                        standoff=2,
+                        xanchor="left",
+                        yanchor="middle",
+                        align="left",
+                        font=dict(color="#6f1028", size=21),
+                        bgcolor="rgba(255,255,255,0.34)",
+                        bordercolor="rgba(255,91,125,0.6)",
+                        borderwidth=1.4,
+                        borderpad=11,
                     )
                 )
             if c > 0:
+                conversion_rate = p / c
                 annotations.append(
                     dict(
-                        x=0.5, y=0.45,
+                        x=0.58, y=0.33,
                         xref="paper", yref="paper",
-                        text=f"转化 {p / c:.1%}",
-                        showarrow=False,
-                        font=dict(color="#00ff88", size=14),
+                        text=(
+                            "<span style='font-size:14px;font-weight:700;letter-spacing:.3px;'>加购→购买转化率</span>"
+                            f"<br><span style='font-size:31px;font-weight:900;letter-spacing:.4px;'>{conversion_rate:.1%}</span>"
+                        ),
+                        showarrow=True,
+                        arrowhead=2,
+                        arrowsize=1.0,
+                        arrowwidth=2.0,
+                        arrowcolor="rgba(16,214,144,0.9)",
+                        ax=210,
+                        ay=14,
+                        standoff=2,
+                        xanchor="left",
+                        yanchor="middle",
+                        align="left",
+                        font=dict(color="#0b5c46", size=21),
+                        bgcolor="rgba(255,255,255,0.34)",
+                        bordercolor="rgba(16,214,144,0.62)",
+                        borderwidth=1.4,
+                        borderpad=11,
                     )
                 )
 
         fig_funnel = go.Figure(
             go.Funnel(
-                y=funnel_rows["event_type"],
+                y=funnel_rows["stage_label"],
                 x=funnel_rows["session_count"],
-                textinfo="value+percent initial",
+                texttemplate="<b>%{value:,.0f}</b><br>%{percentInitial:.1%}",
+                textposition="inside",
+                textfont=dict(
+                    size=20,
+                    color="#071729",
+                    family="Microsoft YaHei, Segoe UI, sans-serif",
+                ),
+                connector={"line": {"color": "rgba(241,245,255,0.85)", "width": 2}},
                 marker={"color": [COLOR_MAP.get(t, "#888") for t in funnel_rows["event_type"]]},
             )
         )
         fig_funnel.update_layout(
-            height=400,
-            margin=dict(l=20, r=80, t=30, b=20),
+            height=460,
+            margin=dict(l=120, r=250, t=30, b=20),
             annotations=annotations,
+            paper_bgcolor="rgba(236,244,253,0.92)",
+            plot_bgcolor="rgba(236,244,253,0.92)",
         )
+        fig_funnel.update_yaxes(
+            tickfont=dict(
+                size=26,
+                color="#111111",
+                family="Microsoft YaHei, Segoe UI, sans-serif",
+            ),
+            automargin=True,
+        )
+        fig_funnel.update_xaxes(showticklabels=False, showgrid=False, zeroline=False)
         st.plotly_chart(fig_funnel, width="stretch")
 
     with right:

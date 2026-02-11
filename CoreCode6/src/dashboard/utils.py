@@ -125,9 +125,32 @@ section[data-testid="stSidebar"] .stMarkdown,
 section[data-testid="stSidebar"] p,
 section[data-testid="stSidebar"] label,
 section[data-testid="stSidebar"] span{color:#fff!important;font-size:16px!important;text-shadow:0 1px 2px rgba(0,0,0,.5);}
-section[data-testid="stSidebar"] [data-testid="stSidebarNav"] a,
-section[data-testid="stSidebar"] [data-testid="stSidebarNav"] a span{color:#eaf3ff!important;}
-section[data-testid="stSidebar"] [data-testid="stSidebarNav"] a:hover{background:rgba(0,212,255,.12);border-radius:8px;}
+section[data-testid="stSidebar"] [data-testid="stSidebarNav"]{margin-top:6px;}
+section[data-testid="stSidebar"] [data-testid="stSidebarNav"] p{
+  color:#d8ebff!important;
+  font-size:1rem!important;
+  font-weight:700!important;
+  letter-spacing:.4px!important;
+}
+section[data-testid="stSidebar"] [data-testid="stSidebarNav"] a{
+  color:#eaf3ff!important;
+  min-height:40px!important;
+  padding:8px 10px!important;
+  border-radius:10px;
+  font-size:1.04rem!important;
+  font-weight:700!important;
+  line-height:1.35!important;
+}
+section[data-testid="stSidebar"] [data-testid="stSidebarNav"] a span{
+  color:#eaf3ff!important;
+  font-size:1.04rem!important;
+  font-weight:700!important;
+}
+section[data-testid="stSidebar"] [data-testid="stSidebarNav"] a:hover{background:rgba(0,212,255,.12);border-radius:10px;}
+section[data-testid="stSidebar"] [data-testid="stSidebarNav"] a[aria-current="page"]{
+  background:rgba(0,212,255,.2)!important;
+  border:1px solid rgba(0,212,255,.35)!important;
+}
 
 /* ── 动画关键帧 ──────────────────────────────────── */
 @keyframes fadeInUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
@@ -210,6 +233,16 @@ div[data-testid="stAlert"] *{color:inherit!important;}
 .stPlotlyChart{animation:fadeInUp .7s ease-out forwards;opacity:0;}
 .stHorizontalBlock:nth-child(odd) .stPlotlyChart{animation-delay:.2s}
 .stHorizontalBlock:nth-child(even) .stPlotlyChart{animation-delay:.4s}
+
+/* ── Plotly 工具栏位置修正：右上改左上，避免与图例重叠 ───────── */
+.stPlotlyChart .modebar-container{
+  right:auto!important;
+  left:8px!important;
+}
+.stPlotlyChart .modebar{
+  right:auto!important;
+  left:0!important;
+}
 
 /* ── 分隔线 & 隐藏默认 ───────────────────────────── */
 hr{border:none;height:1px;background:linear-gradient(90deg,transparent,#3a5a8a,transparent);margin:30px 0;}
