@@ -42,8 +42,12 @@ logs/
 data/row/
 data/dwd/
 data/ads/
+data/serving/
 data/*.zip
 data/*.cfg
+
+# Local runtime artifacts
+.spark_local/
 
 # OS metadata
 .DS_Store

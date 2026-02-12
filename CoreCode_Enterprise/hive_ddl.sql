@@ -18,7 +18,7 @@ CREATE EXTERNAL TABLE IF NOT EXISTS ecop.ods_user_behavior (
 PARTITIONED BY (dt_month STRING)          -- 按月分区: '2019-10', '2019-11', ...
 ROW FORMAT DELIMITED FIELDS TERMINATED BY ','
 STORED AS TEXTFILE
-LOCATION '/ecop/ods/user_behavior'
+LOCATION 'hdfs://192.168.121.160:9000/ecop/ods/user_behavior'
 TBLPROPERTIES ('skip.header.line.count'='1');
 
 -- ═══════════════════════════════════════════════════════

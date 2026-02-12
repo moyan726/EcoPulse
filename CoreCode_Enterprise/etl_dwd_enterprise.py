@@ -4,6 +4,7 @@ DWD 层 ETL 脚本 (Enterprise Version)
 """
 import sys
 from pathlib import Path
+import argparse
 from pyspark.sql.functions import count as spark_count, col, lit, to_timestamp, to_date
 
 # 添加项目根目录到 sys.path，以便导入 common 模块
@@ -12,7 +13,20 @@ sys.path.append(str(PROJECT_ROOT))
 
 from common.spark_config import get_spark_session
 
+def _parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--dt-month",
+        action="append",
+        dest="dt_months",
+        default=[],
+        help="ODS 月分区过滤（可重复指定），如：--dt-month 2019-10",
+    )
+    return parser.parse_args()
+
+
 def main():
+    args = _parse_args()
     spark = get_spark_session(
         app_name="EcoPulse_ETL_DWD",
         enable_hive=True
@@ -21,11 +35,14 @@ def main():
     print("[INFO] Reading from ODS: ecop.ods_user_behavior")
     try:
         # 1. 读取 ODS 全量数据
-        df_raw = spark.sql("SELECT * FROM ecop.ods_user_behavior")
-        
-        # 简单统计
-        total_count = df_raw.count()
-        print(f"[INFO] Total ODS rows: {total_count:,}")
+        if args.dt_months:
+            dt_month_list = ", ".join([f"'{m}'" for m in args.dt_months])
+            df_raw = spark.sql(
+                f"SELECT * FROM ecop.ods_user_behavior WHERE dt_month IN ({dt_month_list})"
+            )
+            print(f"[INFO] ODS filter dt_month IN ({dt_month_list})")
+        else:
+            df_raw = spark.sql("SELECT * FROM ecop.ods_user_behavior")
         
         # 2. 数据清洗
         # 2.1 剔除 Bot 流量 (Session 频率异常检测)
@@ -35,8 +52,7 @@ def main():
         )
         # 阈值: 单 Session 超过 500 次事件视为 Bot
         bot_sessions = session_counts.filter(col("event_cnt") > 500)
-        bot_count = bot_sessions.count()
-        print(f"[INFO] Identified {bot_count:,} bot sessions (>500 events)")
+        print("[INFO] Identified bot sessions (>500 events)")
         
         # 使用 left_anti join 剔除 Bot
         df_clean = df_raw.join(bot_sessions, on="user_session", how="left_anti")
@@ -51,7 +67,8 @@ def main():
         # dt 分区字段 -> date
         df_final = df_final \
             .withColumn("event_time", to_timestamp("event_time", "yyyy-MM-dd HH:mm:ss z")) \
-            .withColumn("dt", to_date("event_time"))
+            .withColumn("dt", to_date("event_time")) \
+            .repartition(200) # 优化：降低写入并发，避免小文件和 DataNode 过载
             
         # 3. 写入 DWD 层
         print("[INFO] Writing to DWD: ecop.dwd_user_behavior")
@@ -70,7 +87,6 @@ def main():
         
         df_final.select(cols).write \
             .mode("overwrite") \
-            .format("hive") \
             .insertInto("ecop.dwd_user_behavior")
             
         print("[SUCCESS] DWD ETL Completed.")
@@ -80,6 +96,7 @@ def main():
         # 如果是 Metastore 连接问题，尝试打印更详细信息
         import traceback
         traceback.print_exc()
+        sys.exit(1)
         
     spark.stop()
 

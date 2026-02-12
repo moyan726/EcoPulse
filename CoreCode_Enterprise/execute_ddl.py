@@ -2,16 +2,17 @@
 执行 Hive DDL 脚本
 在 Spark 中运行 hive_ddl.sql，创建 ODS/DWD/ADS 表结构。
 """
+import sys
 from pathlib import Path
-from pyspark.sql import SparkSession
+
+# 添加项目根目录到 sys.path
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+sys.path.append(str(PROJECT_ROOT))
+
+from common.spark_config import get_spark_session
 
 def main():
-    spark = SparkSession.builder \
-        .appName("EcoPulse_Init_Schema") \
-        .config("spark.sql.catalogImplementation", "hive") \
-        .config("hive.metastore.uris", "thrift://192.168.121.160:9083") \
-        .enableHiveSupport() \
-        .getOrCreate()
+    spark = get_spark_session(app_name="EcoPulse_Init_Schema", enable_hive=True)
 
     ddl_file = Path(__file__).parent / "hive_ddl.sql"
     
@@ -21,6 +22,10 @@ def main():
 
     # 简单拆分 SQL 语句 (以分号分隔)
     statements = [s.strip() for s in sql_content.split(";") if s.strip()]
+    
+    # 强制重建数据库 (CASCADE 删除所有表，确保清理旧的 Warehouse 路径)
+    print("Dropping database 'ecop' CASCADE to cleanup old metadata...")
+    spark.sql("DROP DATABASE IF EXISTS ecop CASCADE")
     
     for i, sql in enumerate(statements):
         print(f"\nExecuting statement {i+1}/{len(statements)}:")
