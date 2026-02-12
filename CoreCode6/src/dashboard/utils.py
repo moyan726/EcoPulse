@@ -128,7 +128,7 @@ section[data-testid="stSidebar"] span{color:#fff!important;font-size:16px!import
 section[data-testid="stSidebar"] [data-testid="stSidebarNav"]{margin-top:6px;}
 section[data-testid="stSidebar"] [data-testid="stSidebarNav"] p{
   color:#d8ebff!important;
-  font-size:1rem!important;
+  font-size:1.5rem!important;
   font-weight:700!important;
   letter-spacing:.4px!important;
 }
@@ -137,13 +137,13 @@ section[data-testid="stSidebar"] [data-testid="stSidebarNav"] a{
   min-height:40px!important;
   padding:8px 10px!important;
   border-radius:10px;
-  font-size:1.04rem!important;
+  font-size:1.5rem!important;
   font-weight:700!important;
   line-height:1.35!important;
 }
 section[data-testid="stSidebar"] [data-testid="stSidebarNav"] a span{
   color:#eaf3ff!important;
-  font-size:1.04rem!important;
+  font-size:1.5rem!important;
   font-weight:700!important;
 }
 section[data-testid="stSidebar"] [data-testid="stSidebarNav"] a:hover{background:rgba(0,212,255,.12);border-radius:10px;}
