@@ -22,7 +22,7 @@ from src.dashboard.animations import (
 )
 from src.dashboard.utils import COLOR_MAP, init_plotly_theme, inject_custom_css, load_data
 
-st.set_page_config(page_title="品牌深度分析", page_icon="📊", layout="wide")
+st.set_page_config(page_title="Market & Brand Performance", page_icon="🚀", layout="wide")
 logging.getLogger("streamlit.runtime.scriptrunner_utils.script_run_context").setLevel(
     logging.ERROR
 )
@@ -39,7 +39,7 @@ def main() -> None:
         st.stop()
 
     st.markdown(
-        '<div class="big-title">🏢 品牌深度分析 (Brand Deep Dive)</div>',
+        '<div class="big-title">🚀 Market & Brand Performance (市场与品牌表现)</div>',
         unsafe_allow_html=True,
     )
 
@@ -47,6 +47,7 @@ def main() -> None:
     st.sidebar.title("🔍 品牌筛选")
     df_brand_agg = df_funnel[df_funnel["dimension"] == "brand"].copy()
     if df_brand_agg.empty:
+
         st.warning("funnel_stats.csv 中无 brand 维度数据。")
         st.stop()
 

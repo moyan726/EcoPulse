@@ -1,4 +1,4 @@
-# 📚 项目文档中心
+﻿# 📚 项目文档中心
 
 > **版本**：v1.0.0  
 > **最后更新**：2026-01-29  
@@ -23,6 +23,7 @@ docs/
 │
 ├── guides/                     # 📖 指南文档
 │   ├── ENVIRONMENT.md          #    环境配置指南
+│   ├── VM_CLUSTER_COMPONENTS.md #    虚拟机与组件清单
 │   └── PYSPARK_PERF_NOTES.md   #    性能优化指南
 │
 ├── logs/                       # 📝 过程记录
@@ -57,6 +58,7 @@ docs/
 | 文档 | 描述 | 适用场景 |
 |:-----|:-----|:---------|
 | [ENVIRONMENT.md](guides/ENVIRONMENT.md) | Conda 环境、JAVA_HOME、工作流程 | 环境配置 |
+| [VM_CLUSTER_COMPONENTS.md](guides/VM_CLUSTER_COMPONENTS.md) | 三节点虚拟机角色、端口、Hive 启动与排障清单 | 集群运维 |
 | [PYSPARK_PERF_NOTES.md](guides/PYSPARK_PERF_NOTES.md) | 数据倾斜、存储优化、缓存策略 | 性能调优 |
 
 ---

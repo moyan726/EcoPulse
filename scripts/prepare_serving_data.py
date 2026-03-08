@@ -52,9 +52,35 @@ def _read_parquet_dir(parquet_dir: Path) -> pd.DataFrame:
     return df
 
 
+def _qcut_score(series: pd.Series, q: int = 5, ascending: bool = True) -> pd.Series:
+    """
+    基于分位数将连续值打 1~q 分。
+
+    Parameters
+    ----------
+    series : pd.Series  连续值列
+    q : int              分桶数（默认 5）
+    ascending : bool     True = 值越大分越高；False = 值越小分越高（如 recency）
+    """
+    try:
+        buckets = pd.qcut(series, q=q, labels=False, duplicates="drop")
+    except ValueError:
+        # 数据分布极端时 qcut 可能失败，退化为等宽分桶
+        buckets = pd.cut(series, bins=q, labels=False, duplicates="drop")
+
+    # buckets 为 0-based，转换为 1-based
+    scores = buckets + 1
+    if not ascending:
+        scores = q + 1 - scores
+    return scores.astype("Int64")  # nullable integer，保留 NaN
+
+
 def _resegment_rfm(df: pd.DataFrame) -> pd.DataFrame:
     """
     基于 r_score / f_score / m_score 重新计算 8 段 RFM 分群。
+
+    若数据中不含评分列（r_score/f_score/m_score），则自动基于
+    recency/frequency/monetary 使用分位数法打 1-5 分后再分群。
 
     分群逻辑（适配实际数据分布）:
         fm_score = f_score + m_score  (综合购买力)
@@ -70,14 +96,28 @@ def _resegment_rfm(df: pd.DataFrame) -> pd.DataFrame:
         │ r_score ≤ 2 (久未活跃)  │ At Risk (流失预警)            │ Hibernating (沉睡客户)       │
         └────────────────────────┴──────────────────────────────┴─────────────────────────────┘
     """
-    required = {"r_score", "f_score", "m_score"}
-    if not required.issubset(df.columns):
-        print(f"  [警告] RFM 数据缺少必要列 {required - set(df.columns)}，跳过重分群。")
-        return df
-
     import numpy as np
 
+    score_cols = {"r_score", "f_score", "m_score"}
+    raw_cols   = {"recency", "frequency", "monetary"}
+
     df = df.copy()
+
+    # ── 若缺少评分列，则自动从原始 RFM 值计算 ──────────────
+    if not score_cols.issubset(df.columns):
+        if not raw_cols.issubset(df.columns):
+            print(f"  [警告] RFM 数据既无评分列 {score_cols - set(df.columns)} "
+                  f"也无原始值列 {raw_cols - set(df.columns)}，跳过重分群。")
+            return df
+
+        print("  [自动打分] 检测到缺少 r_score/f_score/m_score，基于原始 RFM 值自动计算（pd.qcut 5 分位）...")
+        df["r_score"] = _qcut_score(df["recency"],   q=5, ascending=False)  # recency 越小越好 → 反向
+        df["f_score"] = _qcut_score(df["frequency"],  q=5, ascending=True)
+        df["m_score"] = _qcut_score(df["monetary"],   q=5, ascending=True)
+        print(f"    r_score 分布: {df['r_score'].value_counts().sort_index().to_dict()}")
+        print(f"    f_score 分布: {df['f_score'].value_counts().sort_index().to_dict()}")
+        print(f"    m_score 分布: {df['m_score'].value_counts().sort_index().to_dict()}")
+
     df["fm_score"] = df["f_score"] + df["m_score"]
 
     # 动态计算分位阈值，适配实际数据分布
@@ -113,12 +153,12 @@ def _resegment_rfm(df: pd.DataFrame) -> pd.DataFrame:
         "Promising (成长客户)",
         "New Customers (新客户)",
         "Loyal (一般价值客户)",
-        "Need Attention (需要关注)",
-        "At Risk (流失预警)",
-        "Hibernating (沉睡客户)",
+        "Need Attention (需要关注用户)",
+        "At Risk (潜在流失用户)",
+        "Hibernating (沉睡用户)",
     ]
 
-    df["rfm_segment"] = np.select(conditions, labels, default="Hibernating (沉睡客户)")
+    df["rfm_segment"] = np.select(conditions, labels, default="Hibernating (沉睡用户)")
 
     seg_counts = df["rfm_segment"].value_counts()
     print(f"  [RFM 重分群] 共 {seg_counts.nunique()} 个分群：")
